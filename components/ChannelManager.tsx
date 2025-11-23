@@ -13,7 +13,9 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
   const [inputUrl, setInputUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleAddChannel = async () => {
+  const handleAddChannel = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault(); // Prevent default form submission
+    
     if (!inputUrl) return;
     setIsAnalyzing(true);
     addLog({
@@ -44,6 +46,12 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
         setInputUrl('');
     } catch (e) {
         console.error(e);
+        addLog({
+            id: Date.now().toString(),
+            timestamp: new Date(),
+            action: AgentAction.FAILED,
+            message: `Failed to analyze: ${inputUrl}`
+        });
     } finally {
         setIsAnalyzing(false);
     }
@@ -62,12 +70,16 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
 
       <div className="bg-slate-800/50 border border-slate-700/50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-white mb-4">Add New Channel</h3>
-        <div className="flex gap-4">
+        
+        <form onSubmit={handleAddChannel} className="flex gap-4">
           <div className="flex-1 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                <IconYoutube className="h-5 w-5 text-slate-500" />
             </div>
+            <label htmlFor="channel-url" className="sr-only">YouTube Channel URL</label>
             <input
+              id="channel-url"
+              name="channel-url"
               type="text"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
@@ -76,7 +88,7 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
             />
           </div>
           <button
-            onClick={handleAddChannel}
+            type="submit"
             disabled={isAnalyzing || !inputUrl}
             className={`px-6 py-3 rounded-lg font-medium transition-all ${
                 isAnalyzing 
@@ -91,7 +103,7 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
                 </div>
             ) : 'Analyze & Add'}
           </button>
-        </div>
+        </form>
         <p className="mt-2 text-xs text-slate-500">
            * The AI agent will automatically analyze video content styles and audience from this channel.
         </p>
@@ -105,6 +117,7 @@ const ChannelManager: React.FC<ChannelManagerProps> = ({ channels, setChannels, 
                     <button 
                         onClick={() => removeChannel(channel.id)}
                         className="text-slate-600 hover:text-red-400 transition-colors"
+                        aria-label={`Remove ${channel.name}`}
                     >
                         <IconTrash className="w-5 h-5" />
                     </button>

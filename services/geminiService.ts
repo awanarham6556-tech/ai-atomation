@@ -1,13 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 import { Channel } from "../types";
 
-const GEMINI_API_KEY = process.env.API_KEY || '';
-
-// Fallback if no key is present to prevent crashing in preview without env
-const mockResponse = async (text: string) => {
-    await new Promise(r => setTimeout(r, 1500));
-    return text;
+// Safely retrieve API key to prevent crashes in browser-only environments where process is undefined
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || '';
+  } catch (e) {
+    console.warn("Environment variable access failed, utilizing fallback/empty key");
+    return '';
+  }
 };
+
+const GEMINI_API_KEY = getApiKey();
 
 export const analyzeChannel = async (url: string): Promise<Partial<Channel>> => {
     if (!GEMINI_API_KEY) {

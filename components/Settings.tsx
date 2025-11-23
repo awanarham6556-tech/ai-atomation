@@ -24,9 +24,10 @@ const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
               <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-3">Posting Schedule</h3>
               
               <div>
-                  <label className="block text-slate-400 text-sm font-medium mb-2">Videos per Day</label>
+                  <label htmlFor="videos-per-day" className="block text-slate-400 text-sm font-medium mb-2">Videos per Day</label>
                   <div className="flex items-center gap-4">
                       <input 
+                        id="videos-per-day"
                         type="range" 
                         min="1" 
                         max="10" 
@@ -41,8 +42,9 @@ const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
 
               <div className="grid grid-cols-2 gap-4">
                   <div>
-                      <label className="block text-slate-400 text-sm font-medium mb-2">Start Time</label>
+                      <label htmlFor="window-start" className="block text-slate-400 text-sm font-medium mb-2">Start Time</label>
                       <input 
+                        id="window-start"
                         type="time" 
                         value={config.postingWindowStart}
                         onChange={(e) => handleChange('postingWindowStart', e.target.value)}
@@ -50,8 +52,9 @@ const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
                       />
                   </div>
                   <div>
-                      <label className="block text-slate-400 text-sm font-medium mb-2">End Time</label>
+                      <label htmlFor="window-end" className="block text-slate-400 text-sm font-medium mb-2">End Time</label>
                       <input 
+                        id="window-end"
                         type="time" 
                         value={config.postingWindowEnd}
                         onChange={(e) => handleChange('postingWindowEnd', e.target.value)}
@@ -66,8 +69,9 @@ const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
               <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-3">Content Strategy</h3>
               
               <div>
-                  <label className="block text-slate-400 text-sm font-medium mb-2">Target Audience</label>
+                  <label htmlFor="target-audience" className="block text-slate-400 text-sm font-medium mb-2">Target Audience</label>
                   <select 
+                    id="target-audience"
                     value={config.targetAudience}
                     onChange={(e) => handleChange('targetAudience', e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 text-white rounded p-3 focus:ring-1 focus:ring-emerald-500"
@@ -87,6 +91,7 @@ const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
                   </div>
                   <button 
                     onClick={() => handleChange('autoApprove', !config.autoApprove)}
+                    aria-label={config.autoApprove ? "Disable Auto-Approve" : "Enable Auto-Approve"}
                     className={`w-12 h-6 rounded-full transition-colors relative ${config.autoApprove ? 'bg-emerald-500' : 'bg-slate-600'}`}
                   >
                       <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${config.autoApprove ? 'translate-x-6' : 'translate-x-0'}`} />
