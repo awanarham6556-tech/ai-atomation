@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FacebookPage } from '../types';
 import { MOCK_FB_PAGES } from '../constants';
-import { IconFacebook, IconCheck } from '../icons';
+import { IconFacebook, IconCheck, IconShare, IconLink, IconMail, IconTwitter } from '../icons';
 
 interface FacebookConfigProps {
   connectedPages: FacebookPage[];
@@ -27,6 +27,32 @@ const FacebookConfig: React.FC<FacebookConfigProps> = ({ connectedPages, setConn
     setConnectedPages(prev => prev.map(page => 
         page.id === pageId ? { ...page, isConnected: !page.isConnected } : page
     ));
+  };
+
+  const handleShare = async (e: React.MouseEvent, platform: string, pageName: string) => {
+    e.stopPropagation();
+    const mockUrl = `https://facebook.com/${pageName.replace(/\s+/g, '').toLowerCase()}`;
+    const text = `Check out ${pageName} on Facebook!`;
+
+    switch (platform) {
+        case 'Twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(mockUrl)}`, '_blank');
+            break;
+        case 'Email':
+            window.location.href = `mailto:?subject=${encodeURIComponent(pageName)}&body=${encodeURIComponent(text + ' ' + mockUrl)}`;
+            break;
+        case 'Copy Link':
+            try {
+                await navigator.clipboard.writeText(mockUrl);
+                // Use a temporary visual indicator logic or just alert for simplicity in this demo
+                alert(`Link copied: ${mockUrl}`);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            break;
+        default:
+            alert(`Shared on ${platform}`);
+    }
   };
 
   return (
@@ -78,30 +104,65 @@ const FacebookConfig: React.FC<FacebookConfigProps> = ({ connectedPages, setConn
                 {connectedPages.map(page => (
                     <div 
                         key={page.id}
-                        onClick={() => togglePageConnection(page.id)}
-                        className={`p-5 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                        className={`rounded-xl border transition-all overflow-hidden ${
                             page.isConnected 
                             ? 'bg-emerald-900/20 border-emerald-500/50' 
                             : 'bg-slate-800/30 border-slate-700 hover:border-slate-500'
                         }`}
                     >
-                        <div className="flex items-center gap-4">
-                             <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                                 page.isConnected ? 'bg-emerald-600' : 'bg-slate-700'
-                             }`}>
-                                 <span className="font-bold text-white text-lg">{page.name.charAt(0)}</span>
-                             </div>
-                             <div>
-                                 <div className="font-bold text-slate-200">{page.name}</div>
-                                 <div className="text-sm text-slate-500">{page.category} • {page.followers.toLocaleString()} followers</div>
-                             </div>
+                        {/* Page Info & Toggle Area */}
+                        <div 
+                            onClick={() => togglePageConnection(page.id)}
+                            className="p-5 cursor-pointer flex items-center justify-between"
+                        >
+                            <div className="flex items-center gap-4">
+                                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                                     page.isConnected ? 'bg-emerald-600' : 'bg-slate-700'
+                                 }`}>
+                                     <span className="font-bold text-white text-lg">{page.name.charAt(0)}</span>
+                                 </div>
+                                 <div>
+                                     <div className="font-bold text-slate-200">{page.name}</div>
+                                     <div className="text-sm text-slate-500">{page.category} • {page.followers.toLocaleString()} followers</div>
+                                 </div>
+                            </div>
+                            <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${
+                                page.isConnected 
+                                ? 'bg-emerald-500 border-emerald-500' 
+                                : 'border-slate-600'
+                            }`}>
+                                {page.isConnected && <IconCheck className="w-4 h-4 text-white" />}
+                            </div>
                         </div>
-                        <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${
-                            page.isConnected 
-                            ? 'bg-emerald-500 border-emerald-500' 
-                            : 'border-slate-600'
+
+                        {/* Social Sharing Footer */}
+                        <div className={`px-5 py-3 border-t flex items-center justify-between ${
+                            page.isConnected ? 'border-emerald-500/30 bg-emerald-950/30' : 'border-slate-700/50 bg-slate-900/30'
                         }`}>
-                            {page.isConnected && <IconCheck className="w-4 h-4 text-white" />}
+                            <span className="text-xs text-slate-500 font-medium">Share Page Profile</span>
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={(e) => handleShare(e, 'Twitter', page.name)}
+                                    className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-white/5 transition-colors"
+                                    title="Share on Twitter"
+                                >
+                                    <IconTwitter className="w-4 h-4" />
+                                </button>
+                                <button 
+                                    onClick={(e) => handleShare(e, 'Email', page.name)}
+                                    className="p-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-white/5 transition-colors"
+                                    title="Share via Email"
+                                >
+                                    <IconMail className="w-4 h-4" />
+                                </button>
+                                <button 
+                                    onClick={(e) => handleShare(e, 'Copy Link', page.name)}
+                                    className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                                    title="Copy Link"
+                                >
+                                    <IconLink className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
