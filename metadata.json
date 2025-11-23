@@ -1,0 +1,5 @@
+{
+  "name": "Copy of AutoStream AI Agent",
+  "description": "An autonomous AI agent dashboard that manages YouTube content analysis, video scheduling, and automated Facebook publishing with Gemini-powered insights.",
+  "requestFramePermissions": []
+}
