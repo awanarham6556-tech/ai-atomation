@@ -29,7 +29,10 @@ export const processAgentStep = async (
       updateTask(activeTask.id, { progress: newProgress });
 
       // Log intermediate steps
-      if (newProgress === 20) addLog(createLog(AgentAction.DOWNLOADING_VIDEO, `Downloading "${activeTask.title}"...`));
+      if (newProgress === 20) {
+        addLog(createLog(AgentAction.DOWNLOADING_VIDEO, `Downloading "${activeTask.title}"...`));
+      }
+      
       if (newProgress === 50) {
         addLog(createLog(AgentAction.GENERATING_CAPTION, `Analyzing content for "${activeTask.title}"...`));
         const channel = channels.find(c => c.id === activeTask.channelId);
@@ -37,11 +40,19 @@ export const processAgentStep = async (
         updateTask(activeTask.id, { generatedCaption: caption });
         addLog(createLog(AgentAction.GENERATING_CAPTION, `Caption generated: "${caption.substring(0, 30)}..."`));
       }
-      if (newProgress === 80) addLog(createLog(AgentAction.UPLOADING_FACEBOOK, `Uploading to Facebook Page...`));
+
+      if (newProgress === 70) {
+        const channel = channels.find(c => c.id === activeTask.channelId);
+        addLog(createLog(AgentAction.POSTING_LINK, `Posting channel link for ${channel?.name || 'source'}...`));
+      }
+
+      if (newProgress === 80) {
+        addLog(createLog(AgentAction.UPLOADING_FACEBOOK, `Uploading video file to Facebook Page...`));
+      }
       
       if (newProgress >= 100) {
         updateTask(activeTask.id, { status: TaskStatus.COMPLETED, progress: 100 });
-        addLog(createLog(AgentAction.IDLE, `Successfully posted "${activeTask.title}"`));
+        addLog(createLog(AgentAction.IDLE, `Successfully published "${activeTask.title}"`));
       }
     }
   } else if (pendingTask) {

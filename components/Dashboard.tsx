@@ -71,6 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, logs }) => {
                   log.action === AgentAction.FAILED ? 'text-red-400' : 
                   log.action === AgentAction.COMPLETED ? 'text-emerald-400' :
                   log.action === AgentAction.ANALYZING_CHANNEL ? 'text-cyan-400' :
+                  log.action === AgentAction.POSTING_LINK ? 'text-violet-400' :
                   'text-slate-300'
                 }`}>
                   <span className="font-bold opacity-75 mr-2">
